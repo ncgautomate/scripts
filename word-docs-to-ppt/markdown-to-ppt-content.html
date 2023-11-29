@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>markdown-to-ppt-content.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p>Sure, here are the updated slides with images:</p>
+<p><strong>Slide 1: Title Slide</strong></p>
+<p><strong>Title:</strong> OpenAI's Tumultuous Week: Sam Altman's Firing, Employee Unrest, and Microsoft's Intervention</p>
+<p><strong>Subtitle:</strong> A chronological overview of the events that unfolded following Sam Altman's dismissal from OpenAI</p>
+<p><strong>Slide 2: Day 1 - Sam Altman's Ouster</strong></p>
+<p><strong>Headline:</strong> OpenAI's Co-Founder and CEO, Sam Altman, Abruptly Fired</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>Altman's firing caught OpenAI stakeholders and employees off guard.</li>
+<li>The board cited a lack of transparency and candor as reasons for the termination.</li>
+<li>Employee discontent began to simmer, with rumors of a potential collective action.</li>
+</ul>
+<p><strong>Slide 3: Day 2 - Microsoft's Intervention</strong></p>
+<p><strong>Headline:</strong> Microsoft Swoops In, Hiring Sam Altman to Lead In-House AI Lab</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>Microsoft announced the formation of a new AI research lab under Altman's leadership.</li>
+<li>Over 500 OpenAI employees signed a protest letter demanding the board's resignation.</li>
+<li>The board faced mounting pressure from shareholders and threats of legal action.</li>
+</ul>
+<p><strong>Slide 4: Day 3 - Satya Nadella's Intervention</strong></p>
+<p><strong>Headline:</strong> Microsoft CEO Satya Nadella Calls for OpenAI Governance Reform</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>Nadella expressed dissatisfaction with OpenAI's governance structure.</li>
+<li>Discussions emerged regarding OpenAI's unique charter and its fiduciary duty to humanity.</li>
+<li>Nadella remained open to Altman's potential return to OpenAI, reaffirming his current and ongoing collaboration with Microsoft.</li>
+</ul>
+<p><strong>Slide 5: Employee Unrest and Protest</strong></p>
+<p><strong>Headline:</strong> OpenAI Employees Voice Discontent Over Altman's Firing and Demand Board's Resignation</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>Over 700 OpenAI employees signed a protest letter demanding the board's resignation and greater transparency.</li>
+<li>The letter cited the board's lack of communication and consultation with employees as reasons for their dissatisfaction.</li>
+<li>The protest highlighted the growing divide between employees and the board, and the potential for mass resignations.</li>
+</ul>
+<p><strong>Slide 6: Microsoft's Strategic Move</strong></p>
+<p><strong>Headline:</strong> Microsoft Capitalizes on OpenAI's Turmoil to Secure Top AI Talent and Gain a Strategic Advantage</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>Microsoft's timely hiring of Altman and the potential acquisition of OpenAI demonstrated its ability to capitalize on OpenAI's internal conflict and gain a strategic advantage in the AI landscape.</li>
+<li>The move signaled Microsoft's ambition to solidify its position as the leading AI company in the world.</li>
+<li>Altman's expertise and leadership, as well as OpenAI's cutting-edge AI technologies, were seen as valuable assets for Microsoft's AI endeavors.</li>
+</ul>
+<p><strong>Slide 7: OpenAI's Governance Dilemma</strong></p>
+<p><strong>Headline:</strong> OpenAI's Unique Charter and Fiduciary Duty to Humanity Pose Governance Challenges</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>OpenAI's charter mandates a balance between pursuing technological advancements and ensuring responsible AI development.</li>
+<li>The board's fiduciary duty extends to humanity, not solely to shareholders.</li>
+<li>Navigating this complex governance structure has proven challenging for OpenAI, especially in light of recent events.</li>
+</ul>
+<p><strong>Slide 8: The Future of OpenAI</strong></p>
+<p><strong>Headline:</strong> OpenAI Faces an Uncertain Future Amidst Internal Turmoil, Leadership Changes, and Potential Acquisition by Microsoft</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>OpenAI's future remains uncertain following Altman's firing, the employee protest, and the potential acquisition by Microsoft.</li>
+<li>The company must address governance concerns, regain the trust of its workforce, and chart a new path forward.</li>
+<li>The future of OpenAI will depend on its ability to balance innovation with ethical responsibility and to navigate the complex interests of its stakeholders.</li>
+</ul>
+<p><strong>Slide 9: Implications for the AI Industry</strong></p>
+<p><strong>Headline:</strong> OpenAI's Crisis Raises Questions About Governance, Ethical Considerations, and the Future of AI Development</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>OpenAI's turmoil highlights the importance of transparent and accountable governance in AI companies, especially those with unique charters and missions.</li>
+<li>The industry must prioritize ethical considerations and ensure that AI development aligns with human values.</li>
+<li>OpenAI's experience serves as a cautionary tale for other AI companies, and raises important questions about the future of AI development.</li>
+</ul>
+<p>[Imagen of a group of AI researchers discussing the implications of OpenAI's]</p>
+<p>Sure, here is the continuation of the slides, with images where applicable:</p>
+<p><strong>Slide 9: Implications for the AI Industry</strong></p>
+<p><strong>Headline:</strong> OpenAI's Crisis Raises Questions About Governance, Ethical Considerations, and the Future of AI Development</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>OpenAI's turmoil highlights the importance of transparent and accountable governance in AI companies, especially those with unique charters and missions.</li>
+<li>The industry must prioritize ethical considerations and ensure that AI development aligns with human values.</li>
+<li>OpenAI's experience serves as a cautionary tale for other AI companies, and raises important questions about the future of AI development.</li>
+</ul>
+<p><strong>Image:</strong> A group of AI researchers discussing the implications of OpenAI's crisis at a conference.</p>
+<p><strong>Slide 10: Sam Altman's Future</strong></p>
+<p><strong>Headline:</strong> Sam Altman's Next Steps Remain Unclear Amidst Ongoing Microsoft Collaboration</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>Altman's future at Microsoft remains open, with the possibility of returning to OpenAI in the future.</li>
+<li>His expertise and leadership are highly sought after in the AI industry.</li>
+<li>Altman's next steps will have significant implications for the AI landscape.</li>
+</ul>
+<p><strong>Image:</strong> A headshot of Sam Altman looking thoughtful.</p>
+<p><strong>Slide 11: Microsoft's AI Ambitions</strong></p>
+<p><strong>Headline:</strong> Microsoft's Hiring of Altman and Potential Acquisition of OpenAI Signals Its Continued Commitment to AI Dominance</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>Microsoft's acquisition of Altman and the potential acquisition of OpenAI underscores its determination to remain at the forefront of AI development.</li>
+<li>The company's AI investments are expected to grow in the coming years.</li>
+<li>Microsoft's AI strategy is likely to focus on enterprise applications, cloud-based AI solutions, and the development of a general artificial intelligence (AGI).</li>
+</ul>
+<p><strong>Image:</strong> A Microsoft logo with the words &quot;AI Dominance&quot; superimposed on it.</p>
+<p><strong>Slide 12: OpenAI's Path to Recovery</strong></p>
+<p><strong>Headline:</strong> OpenAI Must Focus on Regaining Employee Trust, Reestablishing Stable Governance, and Charting a New Path Forward</p>
+<p><strong>Key Points:</strong></p>
+<ul>
+<li>OpenAI's ability to recover from the recent turmoil will depend on its ability to regain the trust of its employees, reestablish stable governance, and chart a new path forward that is aligned with its mission and values.</li>
+<li>The company must also address the concerns raised by its employees in the protest letter, such as the lack of transparency and communication from the board.</li>
+<li>OpenAI's future success will depend on its ability to learn from its mistakes and emerge from the crisis stronger and more resilient.</li>
+</ul>
+<p><strong>Image:</strong> An image of a phoenix rising from the ashes, symbolizing OpenAI's potential to recover from the crisis.</p>
+
+</body>
+</html>
