@@ -83,7 +83,7 @@ def create_csv_row_from_md(markdown_content, csv_template_path, output_csv_path)
         'keep_trending': keep_trending_default,
         'news_list_items': '',
         'nsfw_post': nsfw_post_default,
-        'post_template': post_template_default
+        'post_template': 'template1'
     }
 
     # Load the existing CSV template and append the new row
