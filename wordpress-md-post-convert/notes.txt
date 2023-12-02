@@ -1,0 +1,36 @@
+
+main header fields we need to focus or should have value:
+post_title		post_content	post_excerpt	post_date	post_name	post_author	post_status	featured_image	post_format	comment_status	ping_status		robots_default	robots_noarchive	robots_nosnippet	robots_noimageindex	robots_notranslate	robots_max_snippet	robots_max_videopreview	robots_max_imagepreview	keyphrases	post_category	post_tag	editors_choice	editors_note	featured-post	keep_trending		post_template
+
+
+csv_row = {
+        'post_title': title,
+        'post_content': content,
+        'post_excerpt': content[:100] + '...',  # First 100 characters of content as excerpt
+        'post_date': post_date_default,
+        'post_name': post_name,
+        'post_author': post_author_default,
+        'post_status': post_status_default,
+        'featured_image': featured_image_default,
+        'post_format': 'standard',
+        'comment_status': 'open',
+        'ping_status': 'open',
+        'robots_default': 'index, follow',
+        'robots_noarchive': 'no',
+        'robots_nosnippet': 'no',
+        'robots_noimageindex': 'no',
+        'robots_notranslate': 'no',
+        'robots_max_snippet': '-1',
+        'robots_max_videopreview': '-1',
+        'robots_max_imagepreview': 'large',
+        'keyphrases': keyphrases,
+        'post_category': post_category_default,
+        'post_tag': seo_tags,
+        'editors_choice': editors_choice_default,
+        'editors_note': '',
+        'featured-post': featured_post_default,
+        'keep_trending': keep_trending_default,
+        'news_list_items': '',
+        'nsfw_post': nsfw_post_default,
+        'post_template': post_template_default
+    }
