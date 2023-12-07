@@ -6,6 +6,13 @@ import csv
 import glob
 from collections import Counter
 import string
+import colorama
+from colorama import Fore, Back, Style
+
+
+colorama.init()
+# Exclude list of files from reading
+#exclude_files = ['README.md', 'notes.md']
 
 
 # Define your CSS content for styling the HTML
@@ -84,8 +91,21 @@ def extract_keyphrases(content):
     most_common_word = Counter(words).most_common(1)[0][0]
     return most_common_word
 
+# Adjusted Regular Expression for SEO tags
+seo_tags_pattern = re.compile(r'(?i)(?:##?#?\s?SEO(?: High[- ]Ranking)? (?:Page )?Tags[:\n] ?|\*{1,3}\s?SEO(?: High[- ]Ranking)? (?:Page )?Tags[:\n] ?|SEO High[- ]ranking page Tags: ?)(.+?)(?:\n\n|\Z)', re.DOTALL)
+
+
+# When calling the function, pass the exclude_files list as an argument:
+exclude_files = ['README.md', 'notes.md']  # Define this outside the function
+
 # Function to process each markdown file
-def process_markdown_file(file_path, directory, default_image_url):
+def process_markdown_file(file_path, directory, default_image_url, exclude_files):
+    # to skip files in the exclude_files list
+    for file in os.listdir(directory):
+        if file not in exclude_files:
+            # Process the file
+            pass
+
     filename_without_ext = os.path.splitext(os.path.basename(file_path))[0]
     image_file_name = filename_without_ext + '.webp'
     image_file_path = os.path.join(directory, image_file_name)
@@ -146,7 +166,6 @@ def process_markdown_file(file_path, directory, default_image_url):
     html_content = re.sub(
         r'<h4>SEO High-Ranking Page Tags</h4>.*', '', html_content, flags=re.DOTALL)
 
-    # ... (rest of the function remains unchanged)
 
     # Initialize default values
     post_author_default = 'trioadmin'
@@ -159,10 +178,13 @@ def process_markdown_file(file_path, directory, default_image_url):
 
 
     # Extract SEO tags using a regex that matches the various provided patterns
-    seo_tags_pattern = re.compile(r'(?i)##? SEO(?: High[- ]Ranking)? (?:Page )?Tags[:\n] ?(.+)', re.DOTALL)
     seo_tags_match = seo_tags_pattern.search(md_content)
-    seo_tags = seo_tags_match.group(1).strip() if seo_tags_match else ""
-
+    if seo_tags_match:
+        # Clean up the extracted tags
+        seo_tags = seo_tags_match.group(1).strip()
+        seo_tags = re.sub(r'[\n,.]+$', '', seo_tags)  # Remove trailing newlines, commas, and periods
+    else:
+        seo_tags = ""
 
 
     # Generate post_name from the title
@@ -202,6 +224,69 @@ def process_markdown_file(file_path, directory, default_image_url):
 
     return csv_row
 
+def main():
+    directory = 'C:/github/ncgcloudhub/scripts/wordpress-md-post-convert/'     #'D:/TrionxAI/scripts/wordpress-md-post-convert/'
+    default_image_url = 'https://dev.trionxai.com/wp-content/uploads/ai-image.webp' # 'https://trionxai.com/wp-content/uploads/ai-image.webp' # PROD
+    #markdown_files = glob.glob(os.path.join(directory, '*.md'))
+    markdown_files = [file for file in glob.glob(os.path.join(directory, '*.md')) if os.path.basename(file) not in ['README.md', 'notes.md']]
+
+
+
+    #headers_csv_path = 'D:/TrionxAI/scripts/wordpress-md-post-convert/headers-only.csv'  # Update with the correct path
+    headers_csv_path = os.path.join(directory, 'headers-only.csv')
+    markdown_files = glob.glob(os.path.join(directory, '*.md'))
+    output_csv_file_name = 'output.csv'
+    csv_file_path = os.path.join(directory, output_csv_file_name)
+    try:
+        # Read the headers from headers-only.csv
+        with open(headers_csv_path, mode='r', encoding='utf-8') as headers_file:
+            headers = headers_file.readline().strip().split(',')
+
+        # Check if the CSV file exists and needs headers
+        needs_header = not os.path.exists(csv_file_path)
+
+        # Write headers if needed and data to the CSV file
+        with open(csv_file_path, 'a', newline='', encoding='utf-8') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=headers)
+
+            if needs_header:
+                writer.writeheader()
+
+            # Define the list of files to exclude
+            exclude_files = ['README.md', 'notes.md']
+
+            for md_file_path in markdown_files:
+                csv_row = process_markdown_file(md_file_path, directory, default_image_url, exclude_files) #process_markdown_file(md_file_path)
+
+                # Ensure csv_row has keys exactly matching the headers
+                row_to_write = {header: csv_row.get(
+                    header, '') for header in headers}
+
+                writer.writerow(row_to_write)
+                pass
+
+    except PermissionError as e:
+        print(f"{Back.RED}{Fore.WHITE}Permission error: Your file {output_csv_file_name} is open. Please make sure to close your file and re-run the script.{Style.RESET_ALL}")
+        return  # or sys.exit(1) to exit the script entirely
+
+    except FileNotFoundError as e:
+        print(f"{Back.RED}{Fore.WHITE}File not found error: The file {e.filename} does not exist. Please check the path and try again.{Style.RESET_ALL}")
+        return  # or sys.exit(1) to exit the script entirely
+
+    except Exception as e:
+        print(f"{Back.RED}{Fore.WHITE}An unexpected error occurred: {e} {Style.RESET_ALL}")
+        return  # or sys.exit(1) to exit the script entirely
+
+    
+
+    print(f"{Back.YELLOW}{Fore.WHITE}CSV file saved as: {csv_file_path}")
+
+
+if __name__ == '__main__':
+    main()
+
+
+
 
 # Creating README.md Files based on the script.
 def create_readme(directory, output_file='README.md'):
@@ -218,45 +303,3 @@ def create_readme(directory, output_file='README.md'):
         readme.write('## License\n\nThis project is licensed under the MIT License.\n')
 
 create_readme('C:/github/ncgcloudhub/scripts/wordpress-md-post-convert/')
-
-
-def main():
-    directory = 'C:/github/ncgcloudhub/scripts/wordpress-md-post-convert/'     #'D:/TrionxAI/scripts/wordpress-md-post-convert/'
-    default_image_url = 'https://dev.trionxai.com/wp-content/uploads/ai-image.webp' # 'https://trionxai.com/wp-content/uploads/ai-image.webp' # PROD
-    markdown_files = glob.glob(os.path.join(directory, '*.md'))
-
-
-    #headers_csv_path = 'D:/TrionxAI/scripts/wordpress-md-post-convert/headers-only.csv'  # Update with the correct path
-    headers_csv_path = os.path.join(directory, 'headers-only.csv')
-    markdown_files = glob.glob(os.path.join(directory, '*.md'))
-    output_csv_file_name = 'output.csv'
-    csv_file_path = os.path.join(directory, output_csv_file_name)
-
-    # Read the headers from headers-only.csv
-    with open(headers_csv_path, mode='r', encoding='utf-8') as headers_file:
-        headers = headers_file.readline().strip().split(',')
-
-    # Check if the CSV file exists and needs headers
-    needs_header = not os.path.exists(csv_file_path)
-
-    # Write headers if needed and data to the CSV file
-    with open(csv_file_path, 'a', newline='', encoding='utf-8') as csv_file:
-        writer = csv.DictWriter(csv_file, fieldnames=headers)
-
-        if needs_header:
-            writer.writeheader()
-
-        for md_file_path in markdown_files:
-            csv_row = process_markdown_file(md_file_path, directory, default_image_url) #process_markdown_file(md_file_path)
-
-            # Ensure csv_row has keys exactly matching the headers
-            row_to_write = {header: csv_row.get(
-                header, '') for header in headers}
-
-            writer.writerow(row_to_write)
-
-    print(f"CSV file saved as: {csv_file_path}")
-
-
-if __name__ == '__main__':
-    main()
