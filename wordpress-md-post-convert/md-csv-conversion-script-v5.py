@@ -85,9 +85,14 @@ def extract_keyphrases(content):
     return most_common_word
 
 # Function to process each markdown file
+def process_markdown_file(file_path, directory, default_image_url):
+    filename_without_ext = os.path.splitext(os.path.basename(file_path))[0]
+    image_file_name = filename_without_ext + '.webp'
+    image_file_path = os.path.join(directory, image_file_name)
 
+    # Check if the corresponding webp image file exists in the directory, otherwise use default
+    featured_image = "https://dev.trionxai.com/wp-content/uploads/" + image_file_name if os.path.exists(image_file_path) else default_image_url
 
-def process_markdown_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         md_content = file.read()  # Read the entire Markdown file content
 
@@ -147,15 +152,16 @@ def process_markdown_file(file_path):
     post_author_default = 'trioadmin'
     # post_date_default = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     post_status_default = 'publish'
-    featured_image_default = 'default_image_url'
+    #default_image_url   = 'https://dev.trionxai.com/wp-content/uploads/ai-image.webp'  #'https://dev.trionxai.com/wp-content/uploads/ai-image.webp'
     editors_choice_default = '1'
     featured_post_default = '1'
     keep_trending_default = '1'
 
-    # Extract SEO tags from the original Markdown content
-    seo_tags_match = re.search(
-        r'#### SEO High-Ranking Page Tags\n(.+)', md_content, re.DOTALL)
+    # Extract SEO tags using the regex that matches all the provided patterns
+    seo_tags_pattern = re.compile(r'(?i)##? SEO(?: and)? (?:High[- ]Ranking)? Page Tags[:\n] (.+)', re.DOTALL)
+    seo_tags_match = seo_tags_pattern.search(md_content)
     seo_tags = seo_tags_match.group(1).strip() if seo_tags_match else ""
+
 
     # Generate post_name from the title
     post_name = create_slug(title)
@@ -169,7 +175,7 @@ def process_markdown_file(file_path):
         'post_name': post_name,
         'post_author': post_author_default,
         'post_status': post_status_default,
-        'featured_image': featured_image_default,
+        'featured_image': featured_image,
         'post_format': 'standard',
         'comment_status': 'open',
         'ping_status': 'open',
@@ -196,7 +202,12 @@ def process_markdown_file(file_path):
 
 
 def main():
-    directory = 'D:/TrionxAI/scripts/wordpress-md-post-convert/'
+    directory = 'C:/github/ncgcloudhub/scripts/wordpress-md-post-convert/'     #'D:/TrionxAI/scripts/wordpress-md-post-convert/'
+    default_image_url = 'https://dev.trionxai.com/wp-content/uploads/ai-image.webp' # 'https://trionxai.com/wp-content/uploads/ai-image.webp' # PROD
+    markdown_files = glob.glob(os.path.join(directory, '*.md'))
+
+
+    #headers_csv_path = 'D:/TrionxAI/scripts/wordpress-md-post-convert/headers-only.csv'  # Update with the correct path
     headers_csv_path = os.path.join(directory, 'headers-only.csv')
     markdown_files = glob.glob(os.path.join(directory, '*.md'))
     output_csv_file_name = 'output.csv'
@@ -217,7 +228,7 @@ def main():
             writer.writeheader()
 
         for md_file_path in markdown_files:
-            csv_row = process_markdown_file(md_file_path)
+            csv_row = process_markdown_file(md_file_path, directory, default_image_url) #process_markdown_file(md_file_path)
 
             # Ensure csv_row has keys exactly matching the headers
             row_to_write = {header: csv_row.get(
