@@ -70,8 +70,3 @@ Bing Create, AI Content Creation, Blogging Tools, Social Media Automation, Busin
 
 **Image Prompt for Dall-E 3:**
 - "A visual representation of Bing Create's interface, showcasing its AI-driven content suggestion feature."
-
-
-![Alt text](<bing 1.png>)
-
-![Alt text](bing.png)
