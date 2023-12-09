@@ -12,7 +12,7 @@ from colorama import Fore, Back, Style
 
 colorama.init()
 # Exclude list of files from reading
-#exclude_files = ['README.md', 'notes.md']
+# exclude_files = ['README.md', 'notes.md']
 
 
 # Define your CSS content for styling the HTML
@@ -91,14 +91,23 @@ def extract_keyphrases(content):
     most_common_word = Counter(words).most_common(1)[0][0]
     return most_common_word
 
+
 # Adjusted Regular Expression for SEO tags
-seo_tags_pattern = re.compile(r'(?i)(?:##?#?\s?SEO(?: High[- ]Ranking)? (?:Page )?Tags[:\n] ?|\*{1,3}\s?SEO(?: High[- ]Ranking)? (?:Page )?Tags[:\n] ?|SEO High[- ]ranking page Tags: ?)(.+?)(?:\n\n|\Z)', re.DOTALL)
+# working almost 100%
+seo_tags_pattern = re.compile(
+    r'(?i)(?:##?#?\s?SEO(?: High[- ]Ranking)? (?:Page )?Tags[:\n] ?|\*{1,3}\s?SEO(?: High[- ]Ranking)? (?:Page )?Tags[:\n] ?|SEO High[- ]ranking page Tags: ?)(.+?)(?:\n\n|\Z)', re.DOTALL)
+# seo_tags_pattern = re.compile(
+#    r'(?i)(?:\*{2,3}\s*SEO High[-\s]*Ranking Page Tags:\s*|\bSEO Tags\b|\bSEO High[-\s]*Ranking Page Tags:|\*{2,3} SEO High[-\s]*Ranking Page Tags:|\bSEO High[-\s]*ranking page Tags:)(.+?)(?=\n\n|\Z|\[|\*{2,3})',
+#    re.DOTALL
+# )
 
 
 # When calling the function, pass the exclude_files list as an argument:
 exclude_files = ['README.md', 'notes.md']  # Define this outside the function
 
 # Function to process each markdown file
+
+
 def process_markdown_file(file_path, directory, default_image_url, exclude_files):
     # to skip files in the exclude_files list
     for file in os.listdir(directory):
@@ -111,7 +120,9 @@ def process_markdown_file(file_path, directory, default_image_url, exclude_files
     image_file_path = os.path.join(directory, image_file_name)
 
     # Check if the corresponding webp image file exists in the directory, otherwise use default
-    featured_image = "https://dev.trionxai.com/wp-content/uploads/" + image_file_name if os.path.exists(image_file_path) else default_image_url
+    featured_image = "https://dev.trionxai.com/wp-content/uploads/" + \
+        image_file_name if os.path.exists(
+            image_file_path) else default_image_url
 
     with open(file_path, 'r', encoding='utf-8') as file:
         md_content = file.read()  # Read the entire Markdown file content
@@ -166,26 +177,24 @@ def process_markdown_file(file_path, directory, default_image_url, exclude_files
     html_content = re.sub(
         r'<h4>SEO High-Ranking Page Tags</h4>.*', '', html_content, flags=re.DOTALL)
 
-
     # Initialize default values
     post_author_default = 'trioadmin'
     # post_date_default = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     post_status_default = 'publish'
-    #default_image_url   = 'https://dev.trionxai.com/wp-content/uploads/ai-image.webp'  #'https://dev.trionxai.com/wp-content/uploads/ai-image.webp'
+    # default_image_url   = 'https://dev.trionxai.com/wp-content/uploads/ai-image.webp'  #'https://dev.trionxai.com/wp-content/uploads/ai-image.webp'
     editors_choice_default = '1'
     featured_post_default = '1'
     keep_trending_default = '1'
-
 
     # Extract SEO tags using a regex that matches the various provided patterns
     seo_tags_match = seo_tags_pattern.search(md_content)
     if seo_tags_match:
         # Clean up the extracted tags
         seo_tags = seo_tags_match.group(1).strip()
-        seo_tags = re.sub(r'[\n,.]+$', '', seo_tags)  # Remove trailing newlines, commas, and periods
+        # Remove trailing newlines, commas, and periods
+        seo_tags = re.sub(r'[\n,.]+$', '', seo_tags)
     else:
         seo_tags = ""
-
 
     # Generate post_name from the title
     post_name = create_slug(title)
@@ -224,15 +233,18 @@ def process_markdown_file(file_path, directory, default_image_url, exclude_files
 
     return csv_row
 
+
 def main():
-    directory = 'C:/github/ncgcloudhub/scripts/wordpress-md-post-convert/'     #'D:/TrionxAI/scripts/wordpress-md-post-convert/'
-    default_image_url = 'https://dev.trionxai.com/wp-content/uploads/ai-image.webp' # 'https://trionxai.com/wp-content/uploads/ai-image.webp' # PROD
-    #markdown_files = glob.glob(os.path.join(directory, '*.md'))
-    markdown_files = [file for file in glob.glob(os.path.join(directory, '*.md')) if os.path.basename(file) not in ['README.md', 'notes.md']]
+    # 'D:/TrionxAI/scripts/wordpress-md-post-convert/'
+    directory = 'E:/Github/orgs/ncgcloudhub/all-scripts/scripts/wordpress-md-post-convert'
+    # 'https://trionxai.com/wp-content/uploads/ai-image.webp' # PROD
+    default_image_url = 'https://dev.trionxai.com/wp-content/uploads/ai-image.webp'
+    # markdown_files = glob.glob(os.path.join(directory, '*.md'))
+    # List the filenames to exclude from processing
+    exclude_files = ['README.md',
+                     'notes.md']
 
-
-
-    #headers_csv_path = 'D:/TrionxAI/scripts/wordpress-md-post-convert/headers-only.csv'  # Update with the correct path
+    # headers_csv_path = 'D:/TrionxAI/scripts/wordpress-md-post-convert/headers-only.csv'  # Update with the correct path
     headers_csv_path = os.path.join(directory, 'headers-only.csv')
     markdown_files = glob.glob(os.path.join(directory, '*.md'))
     output_csv_file_name = 'output.csv'
@@ -256,7 +268,12 @@ def main():
             exclude_files = ['README.md', 'notes.md']
 
             for md_file_path in markdown_files:
-                csv_row = process_markdown_file(md_file_path, directory, default_image_url, exclude_files) #process_markdown_file(md_file_path)
+                # Check if the current file is in the list of files to exclude
+                if os.path.basename(md_file_path) in exclude_files:
+                    continue  # Skip the rest of the loop and process the next file
+                # process_markdown_file(md_file_path)
+                csv_row = process_markdown_file(
+                    md_file_path, directory, default_image_url, exclude_files)
 
                 # Ensure csv_row has keys exactly matching the headers
                 row_to_write = {header: csv_row.get(
@@ -274,18 +291,15 @@ def main():
         return  # or sys.exit(1) to exit the script entirely
 
     except Exception as e:
-        print(f"{Back.RED}{Fore.WHITE}An unexpected error occurred: {e} {Style.RESET_ALL}")
+        print(
+            f"{Back.RED}{Fore.WHITE}An unexpected error occurred: {e} {Style.RESET_ALL}")
         return  # or sys.exit(1) to exit the script entirely
-
-    
 
     print(f"{Back.YELLOW}{Fore.WHITE}CSV file saved as: {csv_file_path}")
 
 
 if __name__ == '__main__':
     main()
-
-
 
 
 # Creating README.md Files based on the script.
@@ -300,6 +314,9 @@ def create_readme(directory, output_file='README.md'):
 
         # Add more sections as needed
         readme.write('\n## Usage\n\nHow to use this project.\n\n')
-        readme.write('## License\n\nThis project is licensed under the MIT License.\n')
+        readme.write(
+            '## License\n\nThis project is licensed under the MIT License.\n')
 
-create_readme('C:/github/ncgcloudhub/scripts/wordpress-md-post-convert/')
+
+create_readme(
+    'E:/Github/orgs/ncgcloudhub/all-scripts/scripts/wordpress-md-post-convert')

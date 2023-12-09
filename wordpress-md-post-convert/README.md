@@ -5,6 +5,7 @@
 Description of your project.
 
 ## Files in this Project
+- adobe.webp
 - adobefirefly.html
 - adobefirefly.md
 - adobefirefly.webp
@@ -19,6 +20,7 @@ Description of your project.
 - aitimemachine.webp
 - amazing.md
 - astria.md
+- autodra.webp
 - autodraw.md
 - avatarai.md
 - bannerbear.md
@@ -35,14 +37,13 @@ Description of your project.
 - md-csv-conversion-script-v5.py
 - md-csv-conversion-script-v6.py
 - md-csv-conversion-script.py
+- morph-stuidio-1.webp
 - notes.md
 - notes.txt
 - output.csv
-- output1.csv
 - postss.csv
 - README.md
 - requirements.txt
-- saiful.html
 - venv
 
 ## Usage
